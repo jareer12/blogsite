@@ -3,14 +3,20 @@ class ComponentModifier {
     this.component = component;
   }
   setKey(key, value) {
-    this.component = this.component.replace(key, value);
+    this.component = this.component.replace(`{{${key}}}`, value);
     return true;
   }
-  appendCssStart(css) {
-    this.component = `<style> ${css} </style>` + this.component;
+  appendCssStart(code) {
+    this.component = `<style> ${code} </style>` + this.component;
   }
-  appendCssEnd(css) {
-    this.component = this.component + `<style> ${css} </style>`;
+  appendCssEnd(code) {
+    this.component = this.component + `<style> ${code} </style>`;
+  }
+  appendJsStart(code) {
+    this.component = `<script> ${code} </script>` + this.component;
+  }
+  appendJsEnd(code) {
+    this.component = this.component + `<script> ${code} </script>`;
   }
 }
 
