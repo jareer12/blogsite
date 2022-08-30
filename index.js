@@ -13,15 +13,18 @@ const ComponentModifier = require("./utils/modifier");
 
 const App = Component(__dirname + "/public/index.html");
 const Body = Component(__dirname + "/src/components/Body.html");
+const Create = Component(__dirname + "/src/components/Create.html");
 const Header = Component(__dirname + "/src/components/Header.html");
 const Document = new ComponentModifier(App);
 
-Document.appendCssStart(fs.readFileSync(`./src/style/index.css`, "utf-8"));
+Document.appendJsStart(fs.readFileSync(`./src/js/tayparser.js`, "utf-8"));
+Document.appendJsStart(fs.readFileSync(`./src/js/prism.js`, "utf-8"));
+
 Document.appendCssStart(fs.readFileSync(`./src/style/tailwinds.css`, "utf-8"));
+Document.appendCssStart(fs.readFileSync(`./src/style/index.css`, "utf-8"));
 Document.appendCssStart(
   fs.readFileSync(`./src/style/custom-prism.css`, "utf-8")
 );
-Document.appendJsStart(fs.readFileSync(`./src/js/prism.js`, "utf-8"));
 
 server.use("*", (req, res, next) => {
   res.header("Content-type", "text/html");
@@ -56,15 +59,30 @@ server.get("/post/:id", async (req, res) => {
     .then((data) => {
       const Post = data[0];
 
+      Main.appendMeta("title", Post.title);
+      Main.appendMeta("keywords", Post.tags);
+      Main.appendMeta("author", "Jareer Abdullah");
+      Main.appendMeta("description", Post.description);
+
       BodyC.setKey("Heading", Post.title);
       BodyC.setKey("Code", Parse.parse(Post.code) || "");
-      Main.setKey("Body", Combine([, BodyC.component]));
+      Main.setKey("Body", Combine([BodyC.component]));
 
+      Main.finalize();
       res.send(Main.component);
     })
     .catch((err) => {
       res.send(`not found`);
     });
+});
+
+server.get("/create", async (req, res) => {
+  const Main = new ComponentModifier(Document.component);
+  let CreateC = new ComponentModifier(Create);
+
+  Main.setKey("Body", CreateC.component);
+  res.send(Main.component);
+  Main.finalize();
 });
 
 server.listen({ port: 3000 });

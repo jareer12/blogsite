@@ -1,4 +1,8 @@
 * {
   margin: 0;
-  font-family: "Outfit", sans-serif !important;
+  font-family: "Outfit", sans-serif;
+}
+
+*:focus {
+  outline: none;
 }
